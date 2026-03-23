@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS controleestoque;
+USE controleestoque;
 CREATE TABLE if NOT EXISTS `usuario` (
   `id_usuario` INT(6) NOT NULL AUTO_INCREMENT,
   `nome` VARCHAR(100) NOT NULL,

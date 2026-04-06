@@ -1,0 +1,33 @@
+{
+  "name": "sistema_estoque",
+  "version": "1.0.0",
+  "description": "<p align=\"center\">\r   Sistema web desenvolvido para <strong>modernizar e automatizar o controle de materiais de consumo</strong> em instituições de ensino.<br/>\r   Desenvolvido com <code>HTML</code>, <code>CSS</code>, <code>JavaScript</code>, <code>Node.js</code>, <code>Express</code> e <code>MySQL</code>.\r </p>",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Iago-Ferreira-Silva/sistema_estoque.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Iago-Ferreira-Silva/sistema_estoque/issues"
+  },
+  "homepage": "https://github.com/Iago-Ferreira-Silva/sistema_estoque#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.20.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

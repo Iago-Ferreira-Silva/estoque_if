@@ -1,0 +1,19 @@
+# Dependências — essa pasta é gerada automaticamente
+# pelo npm install, não precisa subir para o GitHub
+node_modules/
+
+# Variáveis de ambiente — contém senha do banco e
+# chave secreta JWT, nunca deve ir para o GitHub
+.env
+
+# Arquivos gerados pelo sistema operacional
+.DS_Store        # Mac
+Thumbs.db        # Windows
+
+# Logs de erro do Node.js
+*.log
+npm-debug.log*
+
+# Pastas de editores de código
+.vscode/
+.idea/

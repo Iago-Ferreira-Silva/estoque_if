@@ -33,7 +33,7 @@
 
 ## 📁 ESTRUTURA DE PASTAS
 ```bash
-estoque-if/
+estoque_if/
 ├── frontend/
 │   ├── css/
 │   │   ├── global.css

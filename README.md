@@ -267,8 +267,8 @@ Durante o desenvolvimento, alguns desafios contribuíram para o aprendizado:
 
 ### 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/estoque-if.git
-cd estoque-if
+git clone https://github.com/seu-usuario/estoque_if.git
+cd estoque_if
 ```
 
 ### 2. Instale as dependências:

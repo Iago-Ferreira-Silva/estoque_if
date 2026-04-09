@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Sistema de Estoque</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/login.css" />
+</head>
+<body>
+
+<div class="card">
+
+  <!-- PAINEL ESQUERDO -->
+  <div class="panel-left">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+          <line x1="12" y1="22.08" x2="12" y2="12"/>
+        </svg>
+      </div>
+      <h1 class="brand-title">Sistema de<br/>Controle de<br/>Estoque</h1>
+      <p class="brand-sub">Gestão de materiais de consumo<br/>para instituições de ensino.</p>
+    </div>
+
+    <div class="panel-footer">
+      <ul class="badge-list">
+        <li class="badge-item"><span class="badge-dot"></span>Controle de entradas e saídas</li>
+        <li class="badge-item"><span class="badge-dot"></span>Relatórios automáticos por período</li>
+        <li class="badge-item"><span class="badge-dot"></span>Alertas de estoque mínimo</li>
+        <li class="badge-item"><span class="badge-dot"></span>Acesso por nível de usuário</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PAINEL DIREITO -->
+  <div class="panel-right">
+    <div class="form-header">
+      <h2>Bem-vindo de volta!</h2>
+      <p>Acesse sua conta para continuar</p>
+    </div>
+
+    <form id="loginForm" novalidate>
+
+      <div class="form-group" id="group-email">
+        <label for="email">E-mail institucional</label>
+        <div class="input-wrap">
+          <input type="email" id="email" placeholder="usuario@escola.edu.br" autocomplete="email" />
+          <svg viewBox="0 0 24 24">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+        <span class="error-msg">Informe um e-mail válido.</span>
+      </div>
+
+      <div class="form-group" id="group-senha">
+        <label for="senha">Senha</label>
+        <div class="input-wrap">
+          <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password" />
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <button type="button" class="toggle-pw" aria-label="Mostrar senha" id="toggleSenha">
+            <svg id="eyeIcon" viewBox="0 0 24 24">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <span class="error-msg">Informe sua senha.</span>
+      </div>
+
+      <a href="#" class="forgot">Esqueceu sua senha?</a>
+
+      <button type="submit" class="btn-login" id="btnLogin">
+        <span class="btn-text">Entrar</span>
+        <span class="spinner"></span>
+      </button>
+
+    </form>
+
+    <p class="form-foot">IFCE – Campus Crato &nbsp;·&nbsp; v1.0.0</p>
+  </div>
+
+</div>
+
+<script src="../js/login.js"></script>
+</body>
+</html>

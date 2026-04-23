@@ -1,11 +1,11 @@
 {
   "name": "sistema_estoque",
   "version": "1.0.0",
-  "description": "<p align=\"center\">\r   Sistema web desenvolvido para <strong>modernizar e automatizar o controle de materiais de consumo</strong> em instituições de ensino.<br/>\r   Desenvolvido com <code>HTML</code>, <code>CSS</code>, <code>JavaScript</code>, <code>Node.js</code>, <code>Express</code> e <code>MySQL</code>.\r </p>",
-  "main": "index.js",
+  "description": "Sistema web para controle de estoque de materiais em instituições de ensino.",
+  "main": "backend/server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js"
   },
   "repository": {
     "type": "git",

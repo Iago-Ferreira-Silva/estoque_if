@@ -2,10 +2,14 @@ const express    = require('express');
 const router     = express.Router();
 const controller = require('../controllers/setoresController');
 const auth       = require('../middlewares/authMiddleware');
+const authorize  = require('../middlewares/authorizeMiddleware');
 
-router.get('/',       auth, controller.listar);
-router.post('/',      auth, controller.criar);
-router.put('/:id',    auth, controller.atualizar);
-router.delete('/:id', auth, controller.excluir);
+// Qualquer usuário logado pode listar
+router.get('/', auth, controller.listar);
+
+// Apenas gestor pode criar, editar e excluir
+router.post('/',      auth, authorize('gestor'), controller.criar);
+router.put('/:id',    auth, authorize('gestor'), controller.atualizar);
+router.delete('/:id', auth, authorize('gestor'), controller.excluir);
 
 module.exports = router;

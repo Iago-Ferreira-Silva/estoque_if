@@ -2,8 +2,12 @@ const express    = require('express');
 const router     = express.Router();
 const controller = require('../controllers/movimentacoesController');
 const auth       = require('../middlewares/authMiddleware');
+const authorize  = require('../middlewares/authorizeMiddleware');
 
-router.get('/',  auth, controller.listar);
-router.post('/', auth, controller.criar);
+// Qualquer usuário logado pode listar
+router.get('/', auth, controller.listar);
+
+// Gestor, coordenador e secretário podem registrar
+router.post('/', auth, authorize('gestor', 'coordenador', 'secretario'), controller.criar);
 
 module.exports = router;

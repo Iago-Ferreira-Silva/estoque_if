@@ -17,3 +17,6 @@ npm-debug.log*
 # Pastas de editores de código
 .vscode/
 .idea/
+
+# Cobertura de testes
+coverage/

@@ -83,6 +83,31 @@ describe('authMiddleware', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
+  test('deve retornar mensagem correta quando token ausente', () => {
+    const req  = criarReq(null);
+    const res  = criarRes();
+    const next = jest.fn();
+
+    authMiddleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Token não fornecido.'
+    });
+  });
+
+  test('deve retornar mensagem correta quando token inválido', () => {
+    const req  = criarReq('token-invalido');
+    const res  = criarRes();
+    const next = jest.fn();
+
+    authMiddleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Token inválido ou expirado.'
+    });
+  });
 });
 
 describe('authorizeMiddleware', () => {
@@ -158,4 +183,16 @@ describe('authorizeMiddleware', () => {
     }
   });
 
+  test('deve retornar mensagem correta quando não autenticado', () => {
+    const req  = { usuario: null };
+    const res  = criarRes();
+    const next = jest.fn();
+
+    authorizeMiddleware('gestor')(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Não autenticado.'
+    });
+  });
 });

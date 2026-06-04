@@ -255,6 +255,21 @@ describe('PUT /api/usuarios/:id', () => {
     expect(res.body.message).toBe('Erro ao atualizar usuário.');
   });
 
+  test('não deve atualizar senha com menos de 8 caracteres', async () => {
+    db.execute.mockResolvedValueOnce([[]]);
+
+    const res = await request(app)
+      .put('/api/usuarios/2')
+      .set('Authorization', `Bearer ${gerarToken('gestor')}`)
+      .send({
+        nome: 'Maria', email: 'maria@ifce.edu.br',
+        perfil: 'secretario', setor: 'Secretaria',
+        senha: '1234567',
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe('Usuário atualizado com sucesso.');
+  });
 });
 
 describe('PATCH /api/usuarios/:id/status', () => {
@@ -289,5 +304,4 @@ describe('PATCH /api/usuarios/:id/status', () => {
     expect(res.status).toBe(500);
     expect(res.body.message).toBe('Erro ao atualizar status.');
   });
-
 });

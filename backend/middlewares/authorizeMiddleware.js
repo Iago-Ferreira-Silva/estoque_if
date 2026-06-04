@@ -4,14 +4,6 @@
 // tem permissão para acessar a rota
 // ================================
 
-// Hierarquia de perfis do sistema
-const PERFIS = {
-  gestor:      4,
-  coordenador: 3,
-  secretario:  2,
-  agente:      1,
-};
-
 // Retorna um middleware que verifica
 // se o usuário tem o perfil mínimo
 // exigido para acessar a rota

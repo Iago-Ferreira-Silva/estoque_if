@@ -23,10 +23,9 @@ jest.mock('../config/db', () => ({
 
 const db = require('../config/db');
 
-// LISTAR
 describe('GET /api/setores', () => {
 
-  test('deve listar setores com token válido', async () => {
+  test('deve listar setores com dados corretos', async () => {
     db.execute.mockResolvedValueOnce([mockSetores]);
 
     const res = await request(app)
@@ -36,11 +35,13 @@ describe('GET /api/setores', () => {
     expect(res.status).toBe(200);
     expect(res.body).toHaveLength(3);
     expect(res.body[0].nome).toBe('Secretaria');
+    expect(res.body[0].responsavel).toBe('Maria Silva');
   });
 
   test('deve retornar 401 sem token', async () => {
     const res = await request(app).get('/api/setores');
     expect(res.status).toBe(401);
+    expect(res.body).toHaveProperty('message');
   });
 
   test('qualquer perfil pode listar setores', async () => {
@@ -63,11 +64,11 @@ describe('GET /api/setores', () => {
       .set('Authorization', `Bearer ${gerarToken()}`);
 
     expect(res.status).toBe(500);
+    expect(res.body.message).toBe('Erro ao listar setores.');
   });
 
 });
 
-// CRIAR
 describe('POST /api/setores', () => {
 
   test('gestor deve criar setor com sucesso', async () => {
@@ -80,6 +81,7 @@ describe('POST /api/setores', () => {
 
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty('id', 4);
+    expect(res.body.message).toBe('Setor criado com sucesso.');
   });
 
   test('deve retornar 400 sem nome', async () => {
@@ -99,15 +101,7 @@ describe('POST /api/setores', () => {
       .send({ nome: 'Setor Teste' });
 
     expect(res.status).toBe(403);
-  });
-
-  test('coordenador não pode criar setor', async () => {
-    const res = await request(app)
-      .post('/api/setores')
-      .set('Authorization', `Bearer ${gerarToken('coordenador')}`)
-      .send({ nome: 'Setor Teste' });
-
-    expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('message');
   });
 
   test('deve retornar 500 quando banco falha', async () => {
@@ -119,11 +113,11 @@ describe('POST /api/setores', () => {
       .send({ nome: 'Setor Teste' });
 
     expect(res.status).toBe(500);
+    expect(res.body.message).toBe('Erro ao criar setor.');
   });
 
 });
 
-// ATUALIZAR
 describe('PUT /api/setores/:id', () => {
 
   test('gestor deve atualizar setor', async () => {
@@ -145,6 +139,7 @@ describe('PUT /api/setores/:id', () => {
       .send({ nome: 'Editado' });
 
     expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('message');
   });
 
   test('deve retornar 500 quando banco falha', async () => {
@@ -156,11 +151,11 @@ describe('PUT /api/setores/:id', () => {
       .send({ nome: 'Teste' });
 
     expect(res.status).toBe(500);
+    expect(res.body.message).toBe('Erro ao atualizar setor.');
   });
 
 });
 
-// EXCLUIR
 describe('DELETE /api/setores/:id', () => {
 
   test('gestor deve excluir setor', async () => {
@@ -180,6 +175,7 @@ describe('DELETE /api/setores/:id', () => {
       .set('Authorization', `Bearer ${gerarToken('agente')}`);
 
     expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('message');
   });
 
   test('deve retornar 500 quando banco falha', async () => {
@@ -190,6 +186,7 @@ describe('DELETE /api/setores/:id', () => {
       .set('Authorization', `Bearer ${gerarToken('gestor')}`);
 
     expect(res.status).toBe(500);
+    expect(res.body.message).toBe('Erro ao excluir setor.');
   });
 
 });

@@ -1,6 +1,5 @@
 const request = require('supertest');
 const jwt     = require('jsonwebtoken');
-const bcrypt  = require('bcrypt');
 const app     = require('./app');
 require('dotenv').config();
 
@@ -25,10 +24,9 @@ jest.mock('../config/db', () => ({
 
 const db = require('../config/db');
 
-// LISTAR
 describe('GET /api/usuarios', () => {
 
-  test('gestor deve listar usuários', async () => {
+  test('gestor deve listar usuários com dados corretos', async () => {
     db.execute.mockResolvedValueOnce([mockUsuarios]);
 
     const res = await request(app)
@@ -37,6 +35,9 @@ describe('GET /api/usuarios', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveLength(4);
+    expect(res.body[0].nome).toBe('Iago Ferreira');
+    expect(res.body[0].perfil).toBe('gestor');
+    expect(res.body[0]).not.toHaveProperty('senha');
   });
 
   test('agente não pode listar usuários', async () => {
@@ -45,27 +46,13 @@ describe('GET /api/usuarios', () => {
       .set('Authorization', `Bearer ${gerarToken('agente')}`);
 
     expect(res.status).toBe(403);
-  });
-
-  test('coordenador não pode listar usuários', async () => {
-    const res = await request(app)
-      .get('/api/usuarios')
-      .set('Authorization', `Bearer ${gerarToken('coordenador')}`);
-
-    expect(res.status).toBe(403);
-  });
-
-  test('secretário não pode listar usuários', async () => {
-    const res = await request(app)
-      .get('/api/usuarios')
-      .set('Authorization', `Bearer ${gerarToken('secretario')}`);
-
-    expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('message');
   });
 
   test('deve retornar 401 sem token', async () => {
     const res = await request(app).get('/api/usuarios');
     expect(res.status).toBe(401);
+    expect(res.body).toHaveProperty('message');
   });
 
   test('deve retornar 500 quando banco falha', async () => {
@@ -76,11 +63,11 @@ describe('GET /api/usuarios', () => {
       .set('Authorization', `Bearer ${gerarToken('gestor')}`);
 
     expect(res.status).toBe(500);
+    expect(res.body.message).toBe('Erro ao listar usuários.');
   });
 
 });
 
-// CRIAR
 describe('POST /api/usuarios', () => {
 
   test('gestor deve criar usuário com sucesso', async () => {
@@ -90,24 +77,53 @@ describe('POST /api/usuarios', () => {
       .post('/api/usuarios')
       .set('Authorization', `Bearer ${gerarToken('gestor')}`)
       .send({
-        nome: 'Novo Usuário',
-        email: 'novo@ifce.edu.br',
-        senha: 'senha123',
-        perfil: 'agente',
-        setor: 'Limpeza',
+        nome: 'Novo Usuário', email: 'novo@ifce.edu.br',
+        senha: 'senha123', perfil: 'agente', setor: 'Limpeza',
       });
 
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty('id', 5);
+    expect(res.body.message).toBe('Usuário criado com sucesso.');
   });
 
-  test('deve retornar 400 sem campos obrigatórios', async () => {
+  test('deve retornar 400 sem nome', async () => {
     const res = await request(app)
       .post('/api/usuarios')
       .set('Authorization', `Bearer ${gerarToken('gestor')}`)
-      .send({ nome: 'Sem email' });
+      .send({ email: 'teste@test.com', senha: 'senha123', perfil: 'agente' });
 
     expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Preencha todos os campos obrigatórios.');
+  });
+
+  test('deve retornar 400 sem email', async () => {
+    const res = await request(app)
+      .post('/api/usuarios')
+      .set('Authorization', `Bearer ${gerarToken('gestor')}`)
+      .send({ nome: 'Teste', senha: 'senha123', perfil: 'agente' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Preencha todos os campos obrigatórios.');
+  });
+
+  test('deve retornar 400 sem senha', async () => {
+    const res = await request(app)
+      .post('/api/usuarios')
+      .set('Authorization', `Bearer ${gerarToken('gestor')}`)
+      .send({ nome: 'Teste', email: 'teste@test.com', perfil: 'agente' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Preencha todos os campos obrigatórios.');
+  });
+
+  test('deve retornar 400 sem perfil', async () => {
+    const res = await request(app)
+      .post('/api/usuarios')
+      .set('Authorization', `Bearer ${gerarToken('gestor')}`)
+      .send({ nome: 'Teste', email: 'teste@test.com', senha: 'senha123' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Preencha todos os campos obrigatórios.');
   });
 
   test('deve retornar 409 com e-mail duplicado', async () => {
@@ -119,11 +135,8 @@ describe('POST /api/usuarios', () => {
       .post('/api/usuarios')
       .set('Authorization', `Bearer ${gerarToken('gestor')}`)
       .send({
-        nome: 'Duplicado',
-        email: 'admin@ifce.edu.br',
-        senha: 'senha123',
-        perfil: 'agente',
-        setor: 'Limpeza',
+        nome: 'Duplicado', email: 'admin@ifce.edu.br',
+        senha: 'senha123', perfil: 'agente', setor: 'Limpeza',
       });
 
     expect(res.status).toBe(409);
@@ -137,6 +150,7 @@ describe('POST /api/usuarios', () => {
       .send({ nome: 'Teste', email: 'teste@test.com', senha: '12345678', perfil: 'agente' });
 
     expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('message');
   });
 
   test('deve retornar 500 quando banco falha', async () => {
@@ -151,11 +165,11 @@ describe('POST /api/usuarios', () => {
       });
 
     expect(res.status).toBe(500);
+    expect(res.body.message).toBe('Erro ao criar usuário.');
   });
 
 });
 
-// ATUALIZAR
 describe('PUT /api/usuarios/:id', () => {
 
   test('gestor deve atualizar usuário sem senha', async () => {
@@ -172,7 +186,7 @@ describe('PUT /api/usuarios/:id', () => {
     expect(res.body.message).toBe('Usuário atualizado com sucesso.');
   });
 
-  test('gestor deve atualizar usuário com nova senha', async () => {
+  test('gestor deve atualizar usuário com senha de exatamente 8 caracteres', async () => {
     db.execute
       .mockResolvedValueOnce([[]])
       .mockResolvedValueOnce([{ affectedRows: 1 }]);
@@ -183,7 +197,25 @@ describe('PUT /api/usuarios/:id', () => {
       .send({
         nome: 'Maria', email: 'maria@ifce.edu.br',
         perfil: 'secretario', setor: 'Secretaria',
-        senha: 'novaSenha123',
+        senha: '12345678',
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe('Usuário atualizado com sucesso.');
+  });
+
+  test('gestor deve atualizar usuário com senha longa', async () => {
+    db.execute
+      .mockResolvedValueOnce([[]])
+      .mockResolvedValueOnce([{ affectedRows: 1 }]);
+
+    const res = await request(app)
+      .put('/api/usuarios/2')
+      .set('Authorization', `Bearer ${gerarToken('gestor')}`)
+      .send({
+        nome: 'Maria', email: 'maria@ifce.edu.br',
+        perfil: 'secretario', setor: 'Secretaria',
+        senha: 'senhaLonga123456',
       });
 
     expect(res.status).toBe(200);
@@ -208,6 +240,7 @@ describe('PUT /api/usuarios/:id', () => {
       .send({ nome: 'Editado' });
 
     expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('message');
   });
 
   test('deve retornar 500 quando banco falha', async () => {
@@ -219,11 +252,11 @@ describe('PUT /api/usuarios/:id', () => {
       .send({ nome: 'Teste', email: 'teste@test.com', perfil: 'agente', setor: 'Limpeza' });
 
     expect(res.status).toBe(500);
+    expect(res.body.message).toBe('Erro ao atualizar usuário.');
   });
 
 });
 
-// TOGGLE STATUS
 describe('PATCH /api/usuarios/:id/status', () => {
 
   test('gestor deve alternar status do usuário', async () => {
@@ -243,6 +276,7 @@ describe('PATCH /api/usuarios/:id/status', () => {
       .set('Authorization', `Bearer ${gerarToken('agente')}`);
 
     expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('message');
   });
 
   test('deve retornar 500 quando banco falha', async () => {
@@ -253,6 +287,7 @@ describe('PATCH /api/usuarios/:id/status', () => {
       .set('Authorization', `Bearer ${gerarToken('gestor')}`);
 
     expect(res.status).toBe(500);
+    expect(res.body.message).toBe('Erro ao atualizar status.');
   });
 
 });

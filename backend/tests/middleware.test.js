@@ -1,10 +1,9 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const authMiddleware     = require('../middlewares/authMiddleware');
+const authMiddleware      = require('../middlewares/authMiddleware');
 const authorizeMiddleware = require('../middlewares/authorizeMiddleware');
 
-// HELPERS
 function criarReq(token, perfil) {
   return {
     headers: { authorization: token ? `Bearer ${token}` : undefined },
@@ -19,7 +18,6 @@ function criarRes() {
   return res;
 }
 
-// TESTES: authMiddleware
 describe('authMiddleware', () => {
 
   test('deve chamar next() quando token válido', () => {
@@ -48,6 +46,9 @@ describe('authMiddleware', () => {
     authMiddleware(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: expect.any(String) })
+    );
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -59,6 +60,9 @@ describe('authMiddleware', () => {
     authMiddleware(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: expect.any(String) })
+    );
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -81,10 +85,9 @@ describe('authMiddleware', () => {
 
 });
 
-// TESTES: authorizeMiddleware
 describe('authorizeMiddleware', () => {
 
-  test('deve chamar next() quando perfil permitido', () => {
+  test('deve chamar next() quando perfil é gestor', () => {
     const req  = criarReq(null, 'gestor');
     const res  = criarRes();
     const next = jest.fn();
@@ -94,18 +97,7 @@ describe('authorizeMiddleware', () => {
     expect(next).toHaveBeenCalled();
   });
 
-  test('deve retornar 403 quando perfil não permitido', () => {
-    const req  = criarReq(null, 'agente');
-    const res  = criarRes();
-    const next = jest.fn();
-
-    authorizeMiddleware('gestor')(req, res, next);
-
-    expect(res.status).toHaveBeenCalledWith(403);
-    expect(next).not.toHaveBeenCalled();
-  });
-
-  test('deve permitir múltiplos perfis', () => {
+  test('deve chamar next() quando perfil é coordenador e ambos permitidos', () => {
     const req  = criarReq(null, 'coordenador');
     const res  = criarRes();
     const next = jest.fn();
@@ -113,6 +105,31 @@ describe('authorizeMiddleware', () => {
     authorizeMiddleware('gestor', 'coordenador')(req, res, next);
 
     expect(next).toHaveBeenCalled();
+  });
+
+  test('deve retornar 403 quando agente tenta acessar rota de gestor', () => {
+    const req  = criarReq(null, 'agente');
+    const res  = criarRes();
+    const next = jest.fn();
+
+    authorizeMiddleware('gestor')(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: expect.any(String) })
+    );
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  test('deve retornar 403 quando secretario tenta acessar rota restrita', () => {
+    const req  = criarReq(null, 'secretario');
+    const res  = criarRes();
+    const next = jest.fn();
+
+    authorizeMiddleware('gestor', 'coordenador')(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(next).not.toHaveBeenCalled();
   });
 
   test('deve retornar 401 quando usuário não autenticado', () => {
@@ -123,7 +140,22 @@ describe('authorizeMiddleware', () => {
     authorizeMiddleware('gestor')(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: expect.any(String) })
+    );
     expect(next).not.toHaveBeenCalled();
+  });
+
+  test('deve permitir todos os perfis quando todos listados', () => {
+    for (const perfil of ['gestor', 'coordenador', 'secretario', 'agente']) {
+      const req  = criarReq(null, perfil);
+      const res  = criarRes();
+      const next = jest.fn();
+
+      authorizeMiddleware('gestor', 'coordenador', 'secretario', 'agente')(req, res, next);
+
+      expect(next).toHaveBeenCalled();
+    }
   });
 
 });

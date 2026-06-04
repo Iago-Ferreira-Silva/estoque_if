@@ -42,11 +42,25 @@ describe('GET /api/produtos', () => {
     expect(res.status).toBe(200);
     expect(res.body).toHaveLength(2);
     expect(res.body[0].nome).toBe('Papel A4');
+    expect(res.body[0].unidade_minima).toBe('folha');
+    expect(res.body[0].fator_conversao).toBe(500);
   });
 
   test('deve retornar 401 sem token', async () => {
     const res = await request(app).get('/api/produtos');
     expect(res.status).toBe(401);
+    expect(res.body).toHaveProperty('message');
+  });
+
+  test('deve retornar 500 quando banco falha', async () => {
+    db.execute.mockRejectedValueOnce(new Error('Erro de banco'));
+
+    const res = await request(app)
+      .get('/api/produtos')
+      .set('Authorization', `Bearer ${gerarToken()}`);
+
+    expect(res.status).toBe(500);
+    expect(res.body.message).toBe('Erro ao listar produtos.');
   });
 
 });
@@ -66,16 +80,48 @@ describe('POST /api/produtos', () => {
       });
 
     expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('id');
+    expect(res.body).toHaveProperty('id', 3);
+    expect(res.body.message).toBe('Produto criado com sucesso.');
   });
 
-  test('deve retornar 400 sem campos obrigatórios', async () => {
+  test('deve retornar 400 sem nome', async () => {
     const res = await request(app)
       .post('/api/produtos')
       .set('Authorization', `Bearer ${gerarToken('gestor')}`)
-      .send({ nome: 'Sem categoria' });
+      .send({ categoria: 'limpeza', unidade_minima: 'unidade', fator_conversao: 1 });
 
     expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Preencha todos os campos obrigatórios.');
+  });
+
+  test('deve retornar 400 sem categoria', async () => {
+    const res = await request(app)
+      .post('/api/produtos')
+      .set('Authorization', `Bearer ${gerarToken('gestor')}`)
+      .send({ nome: 'Produto', unidade_minima: 'unidade', fator_conversao: 1 });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Preencha todos os campos obrigatórios.');
+  });
+
+  test('deve retornar 400 sem unidade_minima', async () => {
+    const res = await request(app)
+      .post('/api/produtos')
+      .set('Authorization', `Bearer ${gerarToken('gestor')}`)
+      .send({ nome: 'Produto', categoria: 'limpeza', fator_conversao: 1 });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Preencha todos os campos obrigatórios.');
+  });
+
+  test('deve retornar 400 sem fator_conversao', async () => {
+    const res = await request(app)
+      .post('/api/produtos')
+      .set('Authorization', `Bearer ${gerarToken('gestor')}`)
+      .send({ nome: 'Produto', categoria: 'limpeza', unidade_minima: 'unidade' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Preencha todos os campos obrigatórios.');
   });
 
   test('agente não pode criar produto', async () => {
@@ -85,6 +131,22 @@ describe('POST /api/produtos', () => {
       .send({ nome: 'Teste', categoria: 'limpeza' });
 
     expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('message');
+  });
+
+  test('deve retornar 500 quando banco falha', async () => {
+    db.execute.mockRejectedValueOnce(new Error('Erro de banco'));
+
+    const res = await request(app)
+      .post('/api/produtos')
+      .set('Authorization', `Bearer ${gerarToken('gestor')}`)
+      .send({
+        nome: 'Teste', categoria: 'limpeza',
+        unidade_minima: 'unidade', fator_conversao: 1,
+      });
+
+    expect(res.status).toBe(500);
+    expect(res.body.message).toBe('Erro ao criar produto.');
   });
 
 });
@@ -104,6 +166,7 @@ describe('PUT /api/produtos/:id', () => {
       });
 
     expect(res.status).toBe(200);
+    expect(res.body.message).toBe('Produto atualizado com sucesso.');
   });
 
   test('coordenador não pode atualizar produto', async () => {
@@ -113,6 +176,22 @@ describe('PUT /api/produtos/:id', () => {
       .send({ nome: 'Editado' });
 
     expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('message');
+  });
+
+  test('deve retornar 500 quando banco falha', async () => {
+    db.execute.mockRejectedValueOnce(new Error('Erro de banco'));
+
+    const res = await request(app)
+      .put('/api/produtos/1')
+      .set('Authorization', `Bearer ${gerarToken('gestor')}`)
+      .send({
+        nome: 'Teste', categoria: 'limpeza',
+        unidade: 'un', unidade_minima: 'unidade', fator_conversao: 1,
+      });
+
+    expect(res.status).toBe(500);
+    expect(res.body.message).toBe('Erro ao atualizar produto.');
   });
 
 });
@@ -127,6 +206,31 @@ describe('DELETE /api/produtos/:id', () => {
       .set('Authorization', `Bearer ${gerarToken('gestor')}`);
 
     expect(res.status).toBe(200);
+    expect(res.body.message).toBe('Produto excluído com sucesso.');
+  });
+
+  test('deve retornar 404 quando produto não encontrado', async () => {
+    db.execute.mockResolvedValueOnce([{ affectedRows: 0 }]);
+
+    const res = await request(app)
+      .delete('/api/produtos/999')
+      .set('Authorization', `Bearer ${gerarToken('gestor')}`);
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toBe('Produto não encontrado.');
+  });
+
+  test('deve retornar 400 quando produto tem movimentações', async () => {
+    const erro = new Error('Foreign key constraint');
+    erro.code  = 'ER_ROW_IS_REFERENCED_2';
+    db.execute.mockRejectedValueOnce(erro);
+
+    const res = await request(app)
+      .delete('/api/produtos/1')
+      .set('Authorization', `Bearer ${gerarToken('gestor')}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Não é possível excluir este produto pois ele possui movimentações cadastradas.');
   });
 
   test('secretário não pode excluir produto', async () => {
@@ -135,6 +239,7 @@ describe('DELETE /api/produtos/:id', () => {
       .set('Authorization', `Bearer ${gerarToken('secretario')}`);
 
     expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('message');
   });
 
 });

@@ -155,3 +155,91 @@ input, select, textarea {
 input, select, textarea {
   max-width: 100%;
 }
+
+/* MODAL DE ALERTA PERSONALIZADO */
+.alerta-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(22, 35, 48, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9000;
+  padding: 16px;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.alerta-box {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 380px;
+  box-shadow: var(--shadow-lg);
+  animation: modalIn 0.2s ease;
+  overflow: hidden;
+}
+
+.alerta-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px 12px;
+}
+
+.alerta-icone {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.alerta-titulo {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.alerta-corpo {
+  padding: 0 24px 20px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.alerta-footer {
+  padding: 14px 24px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.alerta-btn {
+  padding: 10px 24px;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  border: none;
+  font-family: var(--font-body);
+}
+
+.alerta-btn:active { transform: scale(0.97); }
+
+.alerta-btn-ok {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+.alerta-btn-ok:hover { opacity: 0.85; }
+
+.alerta-btn-danger {
+  background-color: var(--color-danger);
+  color: #fff;
+}
+
+.alerta-btn-danger:hover { opacity: 0.85; }

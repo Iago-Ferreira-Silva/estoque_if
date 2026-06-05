@@ -117,3 +117,61 @@ function mostrarErroTabela(tbodyId, colunas) {
       </td>
     </tr>`;
 }
+
+// ALERTA PERSONALIZADO
+function mostrarAlerta(mensagem, titulo = 'Atenção', icone = '⚠️') {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'alerta-overlay';
+
+    overlay.innerHTML = `
+      <div class="alerta-box">
+        <div class="alerta-header">
+          <span class="alerta-icone">${icone}</span>
+          <span class="alerta-titulo">${titulo}</span>
+        </div>
+        <div class="alerta-corpo">${mensagem}</div>
+        <div class="alerta-footer">
+          <button class="alerta-btn alerta-btn-ok" id="alertaBtnOk">Ok</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const btnOk = overlay.querySelector('#alertaBtnOk');
+    btnOk.focus();
+
+    function fechar() {
+      overlay.remove();
+      resolve();
+    }
+
+    btnOk.addEventListener('click', fechar);
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) fechar();
+    });
+    document.addEventListener('keydown', function handler(e) {
+      if (e.key === 'Enter' || e.key === 'Escape') {
+        document.removeEventListener('keydown', handler);
+        fechar();
+      }
+    });
+  });
+}
+
+// ALERTA DE ERRO PERSONALIZADO
+function mostrarErro(mensagem) {
+  return mostrarAlerta(mensagem, 'Campos obrigatórios', '📋');
+}
+
+// ALERTA DE ESTOQUE INSUFICIENTE
+function mostrarEstoqueInsuficiente(disponivel, unidade, solicitado) {
+  return mostrarAlerta(
+    `Estoque insuficiente!<br><br>
+     <strong>Disponível:</strong> ${disponivel} ${unidade}<br>
+     <strong>Solicitado:</strong> ${solicitado} ${unidade}`,
+    'Estoque insuficiente',
+    '📦'
+  );
+}

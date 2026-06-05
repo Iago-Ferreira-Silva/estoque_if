@@ -102,7 +102,7 @@ document.getElementById('btnSalvar').addEventListener('click', async () => {
   };
 
   if (!dados.nome) {
-    alert('Informe o nome do setor.');
+    await mostrarErro('Informe o nome do setor.');
     return;
   }
 

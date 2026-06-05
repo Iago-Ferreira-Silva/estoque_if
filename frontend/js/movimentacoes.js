@@ -247,7 +247,7 @@ document.querySelectorAll('.tipo-btn').forEach(btn => {
 // SALVAR MOVIMENTAÇÃO
 document.getElementById('btnSalvar').addEventListener('click', async () => {
   if (!produtoSelecionado) {
-    alert('Selecione um produto.');
+    await mostrarErro('Selecione um produto antes de continuar.');
     return;
   }
 
@@ -261,19 +261,17 @@ document.getElementById('btnSalvar').addEventListener('click', async () => {
   const fatorOpcao      = Number(unidadeSelect.selectedOptions[0]?.dataset.fator || 1);
 
   if (!setorId || quantidade <= 0 || !responsavel) {
-    alert('Preencha o setor, a quantidade e o responsável.');
+    await mostrarErro('Preencha o setor, a quantidade e o responsável.');
     return;
   }
 
   const quantidadeConvertida = Math.round((quantidade * fatorOpcao) * 100) / 100;
 
   if (tipo === 'saida' && quantidadeConvertida > Number(produtoSelecionado.qtd_atual)) {
-    alert(
-      `Estoque insuficiente!\n` +
-      `Disponível: ${Number(produtoSelecionado.qtd_atual).toLocaleString('pt-BR')} ` +
-      `${produtoSelecionado.unidade_minima}\n` +
-      `Solicitado: ${quantidadeConvertida.toLocaleString('pt-BR')} ` +
-      `${produtoSelecionado.unidade_minima}`
+    await mostrarEstoqueInsuficiente(
+      Number (produtoSelecionado.qtd_atual).toLocaleString('pt-BR'),
+      produtoSelecionado.unidade_minima,
+      quantidadeConvertida.toLocaleString('pt-BR')
     );
     return;
   }

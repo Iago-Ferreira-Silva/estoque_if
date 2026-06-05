@@ -212,7 +212,7 @@ document.getElementById('btnSalvar').addEventListener('click', async () => {
   const justificativa = document.getElementById('justificativa').value.trim();
 
   if (!produtoId || !setorId || !solicitante || quantidade < 1) {
-    alert('Preencha produto, setor, solicitante e quantidade.');
+    await mostrarErro('Preencha produto, setor, solicitante e quantidade.');
     return;
   }
 

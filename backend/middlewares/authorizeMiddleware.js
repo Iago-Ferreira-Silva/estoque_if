@@ -1,9 +1,4 @@
-// ================================
 // MIDDLEWARE DE AUTORIZAÇÃO
-// Verifica se o perfil do usuário
-// tem permissão para acessar a rota
-// ================================
-
 // Retorna um middleware que verifica
 // se o usuário tem o perfil mínimo
 // exigido para acessar a rota

@@ -211,12 +211,12 @@ document.getElementById('btnSalvar').addEventListener('click', async () => {
   const descricao      = document.getElementById('descricao').value.trim();
 
   if (!nome || !categoria) {
-    alert('Preencha o nome e a categoria.');
+    await mostrarErro('Preencha o nome e a categoria do produto.');
     return;
   }
 
   if (!unidadeMinima || fatorConversao < 1) {
-    alert('Preencha a unidade mínima e o fator de conversão.');
+    await mostrarErro('Preencha a unidade mínima e o fator de conversão.');
     return;
   }
 

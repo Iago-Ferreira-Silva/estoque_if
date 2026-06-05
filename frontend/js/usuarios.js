@@ -196,22 +196,22 @@ document.getElementById("btnSalvar").addEventListener("click", async () => {
   const confirmar = document.getElementById("confirmarSenha").value;
 
   if (!nome || !email || !perfil || !setor) {
-    alert("Preencha todos os campos obrigatórios.");
+    await mostrarErro('Preencha todos os campos obrigatórios.');
     return;
   }
 
   if (editandoId === null && senha.length < 8) {
-    alert("A senha deve ter no mínimo 8 caracteres.");
+    await mostrarErro('A senha deve ter no mínimo 8 caracteres.');
     return;
   }
 
   if (editandoId !== null && senha.length > 0) {
     if (senha.length < 8) {
-      alert("A nova senha deve ter no mínimo 8 caracteres.");
+      await mostrarErro('A nova senha deve ter no mínimo 8 caracteres.');
       return;
     }
     if (senha !== confirmar) {
-      alert("As senhas não coincidem.");
+      await mostrarErro('As senhas não coincidem. Verifique e tente novamente.');
       return;
     }
   }

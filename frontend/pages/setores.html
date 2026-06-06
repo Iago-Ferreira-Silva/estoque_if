@@ -139,6 +139,28 @@
     </div>
   </div>
 
+    <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO -->
+  <div class="modal-overlay" id="modalConfirmacao" hidden>
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h2 class="modal-title">Confirmar exclusão</h2>
+        <button class="modal-close" id="confirmacaoClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="confirmacao-icone">🗑️</div>
+        <p class="confirmacao-texto">
+          Deseja excluir o setor <strong id="confirmacaoNome"></strong>?
+          <br/>
+          <small>Essa ação não pode ser desfeita.</small>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="confirmacaoCancelar">Cancelar</button>
+        <button class="btn-danger" id="confirmacaoConfirmar">Sim, excluir</button>
+      </div>
+    </div>
+  </div>
+
   <script src="../js/utils.js"></script>
   <script src="../js/setores.js"></script>
 </body>

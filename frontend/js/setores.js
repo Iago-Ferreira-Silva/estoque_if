@@ -1,38 +1,16 @@
-// USUÁRIO E SIDEBAR
-const usuario = JSON.parse(localStorage.getItem('usuario'));
-if (!usuario) window.location.href = './login.html';
+inicializarPagina();
 
-document.querySelector('.user-name').textContent = usuario.nome;
-document.querySelector('.user-role').textContent = usuario.perfil;
-document.querySelector('.user-avatar').textContent = usuario.nome
-  .split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
+const perfilAtual = JSON.parse(localStorage.getItem('usuario'))?.perfil;
 
-document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR', {
-  weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
-});
-
-document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-  document.getElementById('sidebar').classList.toggle('open');
-});
-
-document.getElementById('btnLogout')?.addEventListener('click', () => {
-  localStorage.clear();
-  window.location.href = './login.html';
-});
-
-// ESTADO
-let setores = [];
+let setores    = [];
 let editandoId = null;
-const token = localStorage.getItem('token');
-const headers = {
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${token}`,
-};
+let modalConfirmacaoId = null;
 
-// CARREGAR SETORES DA API
 async function carregarSetores() {
   try {
-    const response = await fetch('http://localhost:3000/api/setores', { headers });
+    const response = await fetch('http://localhost:3000/api/setores', {
+      headers: getHeaders(),
+    });
     setores = await response.json();
     filtrar();
   } catch (err) {
@@ -40,7 +18,6 @@ async function carregarSetores() {
   }
 }
 
-// RENDERIZAR TABELA
 function renderTabela(lista) {
   const tbody = document.getElementById('setoresBody');
   const empty = document.getElementById('tableEmpty');
@@ -66,7 +43,6 @@ function renderTabela(lista) {
   `).join('');
 }
 
-// FILTRAR
 function filtrar() {
   const termo = document.getElementById('searchInput').value.toLowerCase();
   renderTabela(setores.filter(s => s.nome.toLowerCase().includes(termo)));
@@ -74,7 +50,7 @@ function filtrar() {
 
 document.getElementById('searchInput').addEventListener('input', filtrar);
 
-// MODAL
+// MODAL DE CADASTRO/EDIÇÃO
 const overlay = document.getElementById('modalOverlay');
 
 function fecharModal() {
@@ -93,12 +69,11 @@ document.getElementById('modalClose').addEventListener('click', fecharModal);
 document.getElementById('btnCancelar').addEventListener('click', fecharModal);
 overlay.addEventListener('click', e => { if (e.target === overlay) fecharModal(); });
 
-// SALVAR
 document.getElementById('btnSalvar').addEventListener('click', async () => {
   const dados = {
-    nome:       document.getElementById('nomeSetor').value.trim(),
+    nome:        document.getElementById('nomeSetor').value.trim(),
     responsavel: document.getElementById('responsavel').value.trim(),
-    descricao:  document.getElementById('descricaoSetor').value.trim(),
+    descricao:   document.getElementById('descricaoSetor').value.trim(),
   };
 
   if (!dados.nome) {
@@ -107,48 +82,99 @@ document.getElementById('btnSalvar').addEventListener('click', async () => {
   }
 
   try {
-    if (editandoId !== null) {
-      await fetch(`http://localhost:3000/api/setores/${editandoId}`, {
-        method: 'PUT', headers, body: JSON.stringify(dados),
-      });
-    } else {
-      await fetch('http://localhost:3000/api/setores', {
-        method: 'POST', headers, body: JSON.stringify(dados),
-      });
+    const url    = editandoId
+      ? `http://localhost:3000/api/setores/${editandoId}`
+      : 'http://localhost:3000/api/setores';
+    const method = editandoId ? 'PUT' : 'POST';
+
+    const response = await fetch(url, {
+      method, headers: getHeaders(), body: JSON.stringify(dados),
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        await mostrarAlerta('Você não tem permissão para realizar esta ação.', 'Acesso negado', '🔒');
+        fecharModal();
+        return;
+      }
+      mostrarToast('Erro ao salvar setor.', 'error');
+      return;
     }
 
+    mostrarToast(editandoId ? 'Setor atualizado!' : 'Setor cadastrado!');
     fecharModal();
     await carregarSetores();
   } catch (err) {
-    alert('Erro ao salvar setor.');
+    mostrarToast('Erro ao salvar setor.', 'error');
   }
 });
 
-// EDITAR
 function abrirEdicao(id) {
   const s = setores.find(s => s.id === id);
   if (!s) return;
 
   editandoId = id;
   document.getElementById('modalTitle').textContent = 'Editar Setor';
-  document.getElementById('nomeSetor').value      = s.nome;
-  document.getElementById('responsavel').value    = s.responsavel || '';
-  document.getElementById('descricaoSetor').value = s.descricao  || '';
+  document.getElementById('nomeSetor').value        = s.nome;
+  document.getElementById('responsavel').value      = s.responsavel || '';
+  document.getElementById('descricaoSetor').value   = s.descricao   || '';
   overlay.hidden = false;
 }
 
-// EXCLUIR
+// MODAL DE CONFIRMAÇÃO DE EXCLUSÃO
+const modalConfirmacao  = document.getElementById('modalConfirmacao');
+const confirmacaoNomeEl = document.getElementById('confirmacaoNome');
+
 async function excluirSetor(id) {
-  if (!confirm('Deseja excluir este setor?')) return;
+  if (perfilAtual !== 'gestor') {
+    await mostrarAlerta(
+      'Você não tem permissão para excluir setores.',
+      'Acesso negado',
+      '🔒'
+    );
+    return;
+  }
+
+  modalConfirmacaoId = id;
+  const setor = setores.find(s => s.id === id);
+  confirmacaoNomeEl.textContent = setor?.nome || 'este setor';
+  modalConfirmacao.hidden = false;
+}
+
+function fecharConfirmacao() {
+  modalConfirmacao.hidden = true;
+  modalConfirmacaoId = null;
+}
+
+document.getElementById('confirmacaoClose').addEventListener('click', fecharConfirmacao);
+document.getElementById('confirmacaoCancelar').addEventListener('click', fecharConfirmacao);
+modalConfirmacao.addEventListener('click', e => {
+  if (e.target === modalConfirmacao) fecharConfirmacao();
+});
+
+document.getElementById('confirmacaoConfirmar').addEventListener('click', async () => {
+  if (!modalConfirmacaoId) return;
+
   try {
-    await fetch(`http://localhost:3000/api/setores/${id}`, {
-      method: 'DELETE', headers,
+    const response = await fetch(`http://localhost:3000/api/setores/${modalConfirmacaoId}`, {
+      method: 'DELETE', headers: getHeaders(),
     });
+
+    if (!response.ok) {
+      const data = await response.json();
+      mostrarToast(data.message || 'Erro ao excluir setor.', 'error');
+      fecharConfirmacao();
+      return;
+    }
+
+    mostrarToast('Setor excluído com sucesso!');
+    fecharConfirmacao();
     await carregarSetores();
   } catch (err) {
-    alert('Erro ao excluir setor.');
+    mostrarToast('Erro ao excluir setor.', 'error');
+    fecharConfirmacao();
   }
-}
+});
 
 // INICIALIZAÇÃO
 carregarSetores();

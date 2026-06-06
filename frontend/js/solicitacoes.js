@@ -1,4 +1,6 @@
 inicializarPagina();
+const perfilAtual = JSON.parse(localStorage.getItem('usuario'))?.perfil;
+const podeAprovar = ['gestor', 'coordenador'].includes(perfilAtual);
 
 // ESTADO
 let solicitacoes = [];
@@ -135,7 +137,7 @@ function renderTabela() {
       ? (unidadeNome[produto.unidade] || produto.unidade)
       : '';
 
-    const acoes = s.status === 'pendente'
+    const acoes = (s.status === 'pendente' && podeAprovar)
       ? `<button class="btn-aprovar" onclick="mudarStatus(${s.id}, 'aprovada')">Aprovar</button>
          <button class="btn-recusar" onclick="mudarStatus(${s.id}, 'recusada')">Recusar</button>`
       : `<span style="color: var(--color-text-light); font-size: 0.8rem;">—</span>`;
@@ -157,11 +159,26 @@ function renderTabela() {
 // MUDAR STATUS
 async function mudarStatus(id, novoStatus) {
   try {
-    await fetch(`http://localhost:3000/api/solicitacoes/${id}/status`, {
+    const response = await fetch(`http://localhost:3000/api/solicitacoes/${id}/status`, {
       method: 'PATCH',
       headers: getHeaders(),
       body: JSON.stringify({ status: novoStatus }),
     });
+
+    if (!response.ok) {
+      const data = await response.json();
+      if (response.status === 403) {
+        await mostrarAlerta(
+          'Você não tem permissão para aprovar ou recusar solicitações.',
+          'Acesso negado',
+          '🔒'
+        );
+        return;
+      }
+      mostrarToast(data.message || 'Erro ao atualizar status.', 'error');
+      return;
+    }
+
     mostrarToast(`Solicitação ${novoStatus === 'aprovada' ? 'aprovada' : 'recusada'}!`);
     await carregarDados();
   } catch (err) {

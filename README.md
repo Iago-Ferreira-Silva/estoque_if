@@ -19,17 +19,17 @@
 
 ## ✨ FUNCIONALIDADES
 
-* 🔐 Autenticação com geração de token JWT
-* 📦 Cadastro e gerenciamento de produtos com conversão de unidades
-* 🏢 Cadastro e gerenciamento de setores da instituição
-* 👤 Gerenciamento de usuários com níveis de acesso
-* 🔄 Registro de movimentações de estoque com conversão automática entre unidades
-* 🧾 Rastreamento de solicitações de materiais por setor
-* 📊 Geração de relatórios filtrados por período, setor e tipo
-* ⚠️ Monitoramento de níveis mínimos de estoque com alertas automáticos
-* 📥 Exportação de relatórios em CSV
-* 🔒 Autorização por perfil de usuário em todas as rotas da API
-* 🌐 Interface web responsiva para desktop, tablet e mobile
+- 🔐 Autenticação com geração de token JWT
+- 📦 Cadastro e gerenciamento de produtos com conversão de unidades
+- 🏢 Cadastro e gerenciamento de setores da instituição
+- 👤 Gerenciamento de usuários com níveis de acesso
+- 🔄 Registro de movimentações de estoque com conversão automática entre unidades
+- 🧾 Rastreamento de solicitações de materiais por setor
+- 📊 Geração de relatórios filtrados por período, setor e tipo
+- ⚠️ Monitoramento de níveis mínimos de estoque com alertas automáticos
+- 📥 Exportação de relatórios em CSV
+- 🔒 Autorização por perfil em rotas restritas, com produtos e movimentações liberados para usuários autenticados
+- 🌐 Interface web responsiva para desktop, tablet e mobile
 
 ---
 
@@ -112,42 +112,44 @@ estoque-if/
 
 ## 🛠️ PRINCIPAIS TECNOLOGIAS UTILIZADAS
 
-* `HTML5` — Estruturação das páginas da aplicação
-* `CSS3` — Estilização e design responsivo da interface
-* `JavaScript` — Interatividade e comunicação com a API
-* `Node.js` — Ambiente de execução JavaScript no servidor
-* `Express.js` — Framework para criação da API REST
-* `MySQL` — Banco de dados relacional
-* `bcrypt` — Criptografia de senhas
-* `jsonwebtoken` — Autenticação via token JWT
-* `dotenv` — Gerenciamento de variáveis de ambiente
-* `Jest` — Framework de testes unitários
-* `Supertest` — Testes de integração HTTP
-* `Stryker` — Testes de mutação
-* `Nodemon` — Atualização automática no desenvolvimento
+- `HTML5` — Estruturação das páginas da aplicação
+- `CSS3` — Estilização e design responsivo da interface
+- `JavaScript` — Interatividade e comunicação com a API
+- `Node.js` — Ambiente de execução JavaScript no servidor
+- `Express.js` — Framework para criação da API REST
+- `MySQL` — Banco de dados relacional
+- `bcrypt` — Criptografia de senhas
+- `jsonwebtoken` — Autenticação via token JWT
+- `dotenv` — Gerenciamento de variáveis de ambiente
+- `Jest` — Framework de testes unitários
+- `Supertest` — Testes de integração HTTP
+- `Stryker` — Testes de mutação
+- `Nodemon` — Atualização automática no desenvolvimento
 
 ---
 
 ## 🔐 AUTENTICAÇÃO E SEGURANÇA
 
-* Login com e-mail e senha criptografada via `bcrypt`
-* Geração de token JWT com expiração configurável
-* Middleware de autenticação protegendo todos os endpoints
-* Middleware de autorização por perfil em cada rota
-* Senhas nunca armazenadas em texto puro no banco de dados
-* Variáveis sensíveis isoladas no `.env` e fora do repositório
-* Usuários inativos bloqueados automaticamente no login
+- Login com e-mail e senha criptografada via `bcrypt`
+- Geração de token JWT com expiração configurável
+- Middleware de autenticação protegendo todos os endpoints
+- Middleware de autorização por perfil em rotas restritas
+- Senhas nunca armazenadas em texto puro no banco de dados
+- Variáveis sensíveis isoladas no `.env` e fora do repositório
+- Usuários inativos bloqueados automaticamente no login
 
 ---
 
 ## 👥 NÍVEIS DE ACESSO
 
-| Perfil | Produtos | Setores | Movimentações | Solicitações | Usuários |
-|---|---|---|---|---|---|
-| Gestor | ✅ Total | ✅ Total | ✅ Total | ✅ Total | ✅ Total |
-| Coordenador | 👁 Leitura | 👁 Leitura | ✅ Registrar | ✅ Aprovar | ❌ |
-| Secretário | 👁 Leitura | 👁 Leitura | ✅ Registrar | 👁 Criar/Ver | ❌ |
-| Agente Adm. | 👁 Leitura | 👁 Leitura | ❌ | 👁 Criar/Ver | ❌ |
+| Perfil      | Produtos | Setores  | Movimentações | Solicitações | Usuários |
+| ----------- | -------- | -------- | ------------- | ------------ | -------- |
+| Gestor      | ✅ Total | ✅ Total | ✅ Total      | ✅ Total     | ✅ Total |
+| Coordenador | ✅ Total | ❌       | ✅ Registrar  | ✅ Criar/Ver | ❌       |
+| Secretário  | ✅ Total | ❌       | ✅ Registrar  | ✅ Criar/Ver | ❌       |
+| Agente Adm. | ✅ Total | ❌       | ✅ Registrar  | ✅ Criar/Ver | ❌       |
+
+> Produtos e movimentações podem ser criados, editados e excluídos por qualquer usuário autenticado. A autorização por perfil é aplicada apenas em rotas específicas, como setores e usuários.
 
 ---
 
@@ -159,15 +161,15 @@ estoque-if/
 npm test
 ```
 
-| Arquivo | Cobertura |
-|---|---|
-| middlewares | 100% |
-| routes | 100% |
-| authController | 90% |
-| produtosController | 96% |
-| setoresController | 100% |
-| usuariosController | 100% |
-| **Geral** | **~91%** |
+| Arquivo            | Cobertura |
+| ------------------ | --------- |
+| middlewares        | 100%      |
+| routes             | 100%      |
+| authController     | 90%       |
+| produtosController | 96%       |
+| setoresController  | 100%      |
+| usuariosController | 100%      |
+| **Geral**          | **~91%**  |
 
 ### Testes de mutação
 
@@ -175,20 +177,22 @@ npm test
 npm run mutation
 ```
 
-| Arquivo | Score |
-|---|---|
-| authMiddleware | 100% |
-| authorizeMiddleware | 86% |
-| **Geral** | **70%** |
+| Arquivo             | Score   |
+| ------------------- | ------- |
+| authMiddleware      | 100%    |
+| authorizeMiddleware | 86%     |
+| **Geral**           | **70%** |
 
 ### Tipos de testes
 
-* `auth.test.js` — Testes de autenticação e JWT
-* `middleware.test.js` — Testes dos middlewares de auth e autorização
-* `autorizacao.test.js` — Testes de acesso por perfil em todas as rotas
-* `produtos.test.js` — Testes de CRUD de produtos
-* `setores.test.js` — Testes de CRUD de setores
-* `usuarios.test.js` — Testes de CRUD de usuários
+- `auth.test.js` — Testes de autenticação e JWT
+- `middleware.test.js` — Testes dos middlewares de auth e autorização
+
+* `autorizacao.test.js` — Testes de acesso por perfil em rotas restritas
+
+- `produtos.test.js` — Testes de CRUD de produtos
+- `setores.test.js` — Testes de CRUD de setores
+- `usuarios.test.js` — Testes de CRUD de usuários
 
 ---
 
@@ -289,13 +293,13 @@ Unidades suportadas: `unidade`, `caixa`, `pacote`, `litro`, `quilo` e suas subdi
 
 O sistema utiliza **MySQL** com as seguintes tabelas:
 
-| Tabela | Descrição |
-|---|---|
-| `usuarios` | Contas com perfil e nível de acesso |
-| `setores` | Departamentos da instituição |
-| `produtos` | Materiais com unidade, fator de conversão e quantidades |
-| `movimentacoes` | Entradas e saídas com conversão automática de unidades |
-| `solicitacoes` | Pedidos de materiais com status de aprovação |
+| Tabela          | Descrição                                               |
+| --------------- | ------------------------------------------------------- |
+| `usuarios`      | Contas com perfil e nível de acesso                     |
+| `setores`       | Departamentos da instituição                            |
+| `produtos`      | Materiais com unidade, fator de conversão e quantidades |
+| `movimentacoes` | Entradas e saídas com conversão automática de unidades  |
+| `solicitacoes`  | Pedidos de materiais com status de aprovação            |
 
 ---
 
@@ -303,9 +307,9 @@ O sistema utiliza **MySQL** com as seguintes tabelas:
 
 ### Pré-requisitos
 
-* [Node.js](https://nodejs.org/) instalado
-* [MySQL](https://www.mysql.com/) instalado e rodando
-* [MySQL Workbench](https://www.mysql.com/products/workbench/) (recomendado)
+- [Node.js](https://nodejs.org/) instalado
+- [MySQL](https://www.mysql.com/) instalado e rodando
+- [MySQL Workbench](https://www.mysql.com/products/workbench/) (recomendado)
 
 ---
 
@@ -355,7 +359,7 @@ npm run dev
 
 Abra o arquivo `frontend/index.html` no navegador e use as credenciais:
 E-mail: admin@ifce.edu.br
-Senha:  admin123
+Senha: admin123
 
 ---
 
@@ -373,36 +377,36 @@ npm run mutation
 
 ## 🚧 DIFICULDADES ENCONTRADAS
 
-* 🔐 Implementação de autenticação JWT com bcrypt
-* 🗄️ Modelagem do banco de dados relacional com chaves estrangeiras
-* 🔗 Integração completa entre front-end, API REST e banco de dados
-* 📱 Desenvolvimento de interface responsiva para múltiplos dispositivos
-* 🔄 Implementação de conversão automática entre unidades de medida
-* 🧩 Autorização por perfil em duas camadas (front-end e API)
-* 🧪 Configuração de testes unitários e de mutação com mocks de banco de dados
+- 🔐 Implementação de autenticação JWT com bcrypt
+- 🗄️ Modelagem do banco de dados relacional com chaves estrangeiras
+- 🔗 Integração completa entre front-end, API REST e banco de dados
+- 📱 Desenvolvimento de interface responsiva para múltiplos dispositivos
+- 🔄 Implementação de conversão automática entre unidades de medida
+- 🧩 Autorização por perfil aplicada onde necessário no front-end e em rotas restritas da API
+- 🧪 Configuração de testes unitários e de mutação com mocks de banco de dados
 
 ---
 
 ## 🧠 APRENDIZADOS
 
-* Criação de APIs REST com Node.js e Express
-* Autenticação e segurança com JWT e bcrypt
-* Modelagem e manipulação de banco de dados MySQL
-* Integração full stack entre front-end e back-end
-* Desenvolvimento de interfaces responsivas com HTML, CSS e JS puro
-* Estruturação de projetos em camadas (controllers, routes, middlewares)
-* Testes unitários, de integração, de autorização e de mutação
-* Conversão e controle de unidades de medida em sistemas de estoque
+- Criação de APIs REST com Node.js e Express
+- Autenticação e segurança com JWT e bcrypt
+- Modelagem e manipulação de banco de dados MySQL
+- Integração full stack entre front-end e back-end
+- Desenvolvimento de interfaces responsivas com HTML, CSS e JS puro
+- Estruturação de projetos em camadas (controllers, routes, middlewares)
+- Testes unitários, de integração, de autorização e de mutação
+- Conversão e controle de unidades de medida em sistemas de estoque
 
 ---
 
 ## 🔐 SEGURANÇA
 
-* Arquivo `.env` fora do repositório — credenciais nunca expostas
-* Senhas criptografadas com `bcrypt` antes de salvar no banco
-* Token JWT com expiração de 8 horas
-* Autorização por perfil verificada em cada rota da API
-* Usuários inativos bloqueados automaticamente no login
+- Arquivo `.env` fora do repositório — credenciais nunca expostas
+- Senhas criptografadas com `bcrypt` antes de salvar no banco
+- Token JWT com expiração de 8 horas
+- Autorização por perfil verificada em rotas restritas da API
+- Usuários inativos bloqueados automaticamente no login
 
 ---
 
